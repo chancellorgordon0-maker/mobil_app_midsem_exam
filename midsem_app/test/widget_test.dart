@@ -1,30 +1,57 @@
-// This is a basic Flutter widget test.
-//
-// To perform an interaction with a widget in your test, use the WidgetTester
-// utility in the flutter_test package. For example, you can send tap and scroll
-// gestures. You can also use WidgetTester to find child widgets in the widget
-// tree, read text, and verify that the values of widget properties are correct.
-
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:midsem_app/main.dart';
 
 void main() {
-  testWidgets('Counter increments smoke test', (WidgetTester tester) async {
-    // Build our app and trigger a frame.
-    await tester.pumpWidget(const MyApp());
+  testWidgets('list displays events and count in AppBar', (tester) async {
+    await tester.pumpWidget(const MidsemApp());
 
-    // Verify that our counter starts at 0.
-    expect(find.text('0'), findsOneWidget);
-    expect(find.text('1'), findsNothing);
+    expect(find.text('Campus Events (6)'), findsOneWidget);
+    expect(find.text('Tech Talk: Flutter in Production'), findsOneWidget);
+  });
 
-    // Tap the '+' icon and trigger a frame.
-    await tester.tap(find.byIcon(Icons.add));
+  testWidgets('tap opens event details', (tester) async {
+    await tester.pumpWidget(const MidsemApp());
+
+    await tester.tap(find.text('Gospel Night'));
+    await tester.pumpAndSettle();
+
+    expect(find.textContaining('University Chapel'), findsOneWidget);
+    expect(find.text('Buy Ticket'), findsOneWidget);
+    expect(find.textContaining('224EI02003702'), findsOneWidget);
+  });
+
+  testWidgets('sold-out event disables reservation', (tester) async {
+    await tester.pumpWidget(const MidsemApp());
+
+    await tester.tap(find.text('Inter-Hall Football Final'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('SOLD OUT'), findsOneWidget);
+    final button = tester.widget<ElevatedButton>(
+      find.widgetWithText(ElevatedButton, 'Buy Ticket'),
+    );
+    expect(button.onPressed, isNull);
+  });
+
+  testWidgets('buy ticket shows confirmation', (tester) async {
+    await tester.pumpWidget(const MidsemApp());
+
+    await tester.tap(find.text('Gospel Night'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Buy Ticket'));
     await tester.pump();
 
-    // Verify that our counter has incremented.
-    expect(find.text('0'), findsNothing);
-    expect(find.text('1'), findsOneWidget);
+    expect(find.text('Ticket reserved for Gospel Night'), findsOneWidget);
+  });
+
+  testWidgets('width 600 or more uses two-column grid', (tester) async {
+    await tester.binding.setSurfaceSize(const Size(700, 800));
+    addTearDown(() => tester.binding.setSurfaceSize(null));
+
+    await tester.pumpWidget(const MidsemApp());
+
+    expect(find.byType(GridView), findsOneWidget);
   });
 }
