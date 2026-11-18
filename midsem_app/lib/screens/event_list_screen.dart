@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import '../data/sample_events.dart';
 import '../models/event.dart';
 import '../utils/format.dart';
+import '../theme/app_theme.dart';
 import 'event_detail_screen.dart';
 
 class EventListScreen extends StatelessWidget {
@@ -31,7 +32,8 @@ class EventListScreen extends StatelessWidget {
             )
           : LayoutBuilder(
               builder: (context, constraints) {
-                final useTwoColumns = constraints.maxWidth >= 600;
+                final useTwoColumns =
+                    constraints.maxWidth >= Breakpoints.tablet;
                 if (useTwoColumns) {
                   return GridView.builder(
                     padding: const EdgeInsets.all(16),

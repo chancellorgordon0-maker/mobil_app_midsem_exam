@@ -45,22 +45,39 @@ class StandardTicket extends Ticket {
     required super.holderName,
   }) : super(
           price: 100.0,
-          description: 'Standard event ticket',
+          description: 'Standard Ticket',
         );
 }
 
 class VipTicket extends Ticket {
   final List<String> additionalBenefits;
+  final int benefitCount;
 
   VipTicket({
     required super.id,
     required super.holderName,
-    List<String> additionalBenefits = const [],
-  })  : additionalBenefits = List.unmodifiable(additionalBenefits),
+    dynamic additionalBenefits = const <String>[],
+  })  : benefitCount = _benefitCount(additionalBenefits),
+        additionalBenefits = additionalBenefits is List<String>
+            ? List<String>.unmodifiable(additionalBenefits)
+            : const <String>[],
         super(
-          price: 150.0 + (20.0 * additionalBenefits.length),
-          description: 'VIP event ticket',
+          price: 150.0 + (20.0 * _benefitCount(additionalBenefits)),
+          description: 'VIP Ticket',
         );
+
+  static int _benefitCount(dynamic benefits) {
+    if (benefits is int) {
+      if (benefits < 0) {
+        throw ArgumentError('Additional benefit count cannot be negative');
+      }
+      return benefits;
+    }
+    if (benefits is List) {
+      return benefits.length;
+    }
+    throw ArgumentError('Additional benefits must be a count or a list');
+  }
 }
 
 double totalSales(List<Ticket> tickets) {

@@ -75,6 +75,16 @@ void main() {
       expect(ticket.price, 190.0);
     });
 
+    test('VIP price accepts a numeric benefit count', () {
+      final ticket = VipTicket(
+        id: 'VIP-2',
+        holderName: 'Esi',
+        additionalBenefits: 3,
+      );
+      expect(ticket.price, 210.0);
+      expect(ticket.benefitCount, 3);
+    });
+
     test('ticket holder name is validated', () {
       expect(
         () => StandardTicket(id: 'S-1', holderName: '  '),
